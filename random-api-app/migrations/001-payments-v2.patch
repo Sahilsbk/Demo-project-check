@@ -1,0 +1,15 @@
+--- a/src/checkout.py
++++ b/src/checkout.py
+@@ -9,6 +9,9 @@
+ 
+ 
+ def checkout(amount_dollars: float, currency: str = "USD"):
+-    # This old API is the v1 API from docs/API_CHANGELOG-v2.md.
+-    # In v2 it is removed; use create_payment(amount_minor_units, currency_code).
+-    return client.create_charge(amount=amount_dollars, currency=currency)
++    # Migrated to API v2: dollars (float) -> minor units (int cents).
++    # A plain rename would charge 100x too little, so convert explicitly.
++    amount_minor_units = int(round(amount_dollars * 100))
++    return client.create_payment(
++        amount_minor_units=amount_minor_units, currency_code=currency
++    )
